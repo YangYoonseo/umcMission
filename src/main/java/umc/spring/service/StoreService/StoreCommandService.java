@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.spring.apiPayload.exception.RegionNotFoundException;
+import umc.spring.converter.StoreConverter;
 import umc.spring.domain.Region;
 import umc.spring.domain.Store;
 import umc.spring.repository.RegionRepository;
@@ -16,6 +17,7 @@ import umc.spring.web.dto.StoreResponseDTO;
 public class StoreCommandService {
     private final RegionRepository regionRepository;
     private final StoreRepository storeRepository;
+    private final StoreConverter storeConverter;
 
     @Transactional
     public StoreResponseDTO addStore(Long regionId, StoreRequestDTO request) {
@@ -23,18 +25,13 @@ public class StoreCommandService {
         Region region = regionRepository.findById(regionId)
                 .orElseThrow(() -> new RegionNotFoundException("존재하지 않는 지역 ID입니다: " + regionId));
 
-        // 가게 생성
-        Store store = Store.builder()
-                .name(request.getName())
-                .address(request.getAddress())
-                .region(region)
-                .build();
+        // StoreCreateRequest -> Store 엔티티 변환
+        Store store = storeConverter.toEntity(request, region);
+
+        // Store 엔티티 저장
         Store savedStore = storeRepository.save(store);
 
-        // 응답 생성
-        return StoreResponseDTO.builder()
-                .storeId(savedStore.getId())
-                .name(savedStore.getName())
-                .build();
+        // Store 엔티티 -> StoreCreateResponse 변환
+        return storeConverter.toDto(savedStore);
     }
 }
