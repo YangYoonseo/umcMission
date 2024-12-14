@@ -3,11 +3,12 @@ package umc.spring.validation.annotation;
 import jakarta.validation.Constraint;
 import umc.spring.validation.validator.CategoriesExistValidator;
 import jakarta.validation.Payload;
+import umc.spring.validation.validator.MissionsChallengeValidator;
 
 import java.lang.annotation.*;
 
 @Documented
-@Constraint(validatedBy = CategoriesExistValidator.class)
+@Constraint(validatedBy = MissionsChallengeValidator.class)
 @Target( { ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidChallenge {
