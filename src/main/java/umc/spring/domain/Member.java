@@ -8,6 +8,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import umc.spring.domain.common.BaseEntity;
 import umc.spring.domain.enums.Gender;
 import umc.spring.domain.enums.MemberStatus;
+import umc.spring.domain.enums.Role;
 import umc.spring.domain.enums.SocialType;
 import umc.spring.domain.mapping.MemberAgree;
 import umc.spring.domain.mapping.MemberMission;
@@ -52,11 +53,17 @@ public class Member extends BaseEntity {
 
     private LocalDate inactiveDate;
 
-//    @Column(nullable = false, length = 50)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @ColumnDefault("0")
     private Integer point;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
 //    연관관계 설정(양방향)
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
@@ -70,4 +77,11 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MemberMission> memberMissionList = new ArrayList<>();
+
+//    회원가입 보안 관련 필드 및 비밀번호 설정
+    public void encodePassword(String password) {
+    this.password = password;
+}
+
+
 }

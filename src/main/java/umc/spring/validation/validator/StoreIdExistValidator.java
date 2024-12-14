@@ -13,26 +13,23 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class StoreIdExistValidator implements ConstraintValidator<ExistStoreId, List<Long>> {
+public class StoreIdExistValidator implements ConstraintValidator<ExistStoreId, Long> {
     private final StoreRepository storeRepository;
 
     @Override
-    public void initialize(ExistStoreId constraintAnnotation) {
-        ConstraintValidator.super.initialize(constraintAnnotation);
-    }
-
-    @Override
-    public boolean isValid(List<Long> values, ConstraintValidatorContext context) {
-        boolean isValid = values.stream()
-                .allMatch(value -> storeRepository.existsById(value));
-
-        if (!isValid) {
-            context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate(ErrorStatus.STORE_NOT_FOUND.toString()).addConstraintViolation();
+    public boolean isValid(Long value, ConstraintValidatorContext context) {
+        if (value == null) {
+            return false; // null 값은 유효하지 않음
         }
 
-        return isValid;
+        boolean exists = storeRepository.existsById(value);
+        if (!exists) {
+            context.disableDefaultConstraintViolation();
+            context.buildConstraintViolationWithTemplate("존재하지 않는 가게 ID입니다.")
+                    .addConstraintViolation();
+        }
 
+        return exists;
     }
 
 }
